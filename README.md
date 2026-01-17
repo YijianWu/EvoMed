@@ -4,10 +4,18 @@ This repository combines the Agentic Context Engineering (ACE) Framework and the
 
 ## Project Structure
 
-*   **`ACE_Framework/`**: Contains the implementation scaffold for reproducing the Agentic Context Engineering method.
-*   **`Medical_Diagnosis_System/`**: Contains the Multi-Specialty Medical Diagnosis System based on an Evolvable Expert Pool.
+*   **`evomed/`**: The main Medical Diagnosis System based on an Evolvable Expert Pool.
+    *   **`evomem/`**: (Located in `evomed/evomem/`) The ACE Framework implementation.
 
 ## Large Files
 
-Some large data files (datasets, indices, DBs) are excluded from this repository. Please refer to `LARGE_FILES_LIST.md` for details on how to obtain and place them.
+Some large data files (datasets, indices, DBs) are excluded from this repository. Please refer to `evomed/data/LARGE_FILES_LIST.md` for details on how to obtain and place them.
 
+## Quick Start
+
+Please navigate to the `evomed` directory to get started:
+
+```bash
+cd evomed
+# Follow instructions in evomed/README.md
+```

@@ -36,7 +36,7 @@ ENV/
 # Logs
 *.log
 
-# Large Data & Files (See LARGE_FILES_LIST.md)
+# Large Data & Files (See evomed/data/LARGE_FILES_LIST.md)
 *.xlsx
 *.bin
 *.sqlite3
@@ -44,7 +44,8 @@ ENV/
 *.pkl
 
 # Project Specific Large Folders
-rag/rag_index/
+# Exclude the entire rag folder as requested
+rag/
 memory_db/
 # Exclude large reports in sub-directories if they are generated artifacts
 reports/questions_report_snapshot_*.md
@@ -52,3 +53,6 @@ case_library/cases_initial.jsonl
 storage/ace_case_library.jsonl
 storage/ace_experiences.jsonl
 
+# Exclude large test file if it appears
+test.xlsx
+guilin_100K_20K_诊断_20260102_161948.xlsx
