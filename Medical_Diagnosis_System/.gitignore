@@ -1,0 +1,50 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+venv/
+env/
+ENV/
+
+# Logs
+*.log
+logs/
+
+# Data files (too large for git)
+*.xlsx
+*.xls
+data/*.xlsx
+data/*.xls
+
+# Checkpoints (intermediate training files)
+ga_gen_*_checkpoint.json
+specialty_pool_*.json
+
+# Results
+batch_results/
+diagnosis_results/
+
+# RAG index files (too large)
+rag/rag_index/
+rag/**/*.pkl
+rag/**/*.faiss
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Experimental code
+exp/
+
+# Temp files
+*.tmp
+*.bak
