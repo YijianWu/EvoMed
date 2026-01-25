@@ -11,31 +11,41 @@ EvoMed is a high-performance medical auxiliary diagnosis system based on an **Ev
 
 ## 📁 Repository Structure
 
-### Core Directories
+### Core Package (`evomed/`)
 
-- **`ace/`**: Contains the core logic for the Modular Experience Library (ACE).
-  - `playbook.py`: Defines structured clinical experience storage.
-  - `retrieval.py`: Implements semantic and modular retrievers using SentenceTransformers and FAISS.
-  - `roles.py`: Defines AI roles (Generator, Reflector, Curator) within the ACE framework.
-- **`src/`**: Core diagnostic pipeline and system management.
-  - `main_diagnosis_pipeline.py`: Main entry point for the medical diagnosis workflow.
-  - `expert_pool.py`: Management of the expert agent collection.
-  - `diagnosis_api.py`: Simplified API interface for diagnostic services.
-  - `api_server.py`: FastAPI server for exposing diagnostic functions over HTTP.
-  - `knowledge_retriever.py`: Unified interface for retrieving from RAG, ACE, and Case libraries.
-  - `hybrid_retriever.py`: Hybrid search implementation (BM25 + Vector) for medical guidelines.
-  - **`training/`**: Scripts for evolving expert pool prompts using Genetic Algorithms.
-  - **`evaluation/`**: Scripts for batch diagnosis and performance assessment.
-- **`rag/`**: RAG-related modules and index building.
-  - `rag_build.py`: Script to build the FAISS index from medical guideline documents.
-- **`scripts/`**: Automation scripts for modular evolution and testing.
-- **`outputs/`**: Storage for optimized expert pools and generated diagnostic reports.
+- **`evomed/`**: The main Python package.
+  - **`ace/`**: Modular Experience Library (ACE) core logic.
+    - `playbook.py`: Structured clinical experience storage.
+    - `retrieval.py`: Semantic and modular retrievers.
+    - `roles.py`: AI agent roles (Generator, Reflector, Curator).
+  - **`data/`**: Data processing and loading modules.
+    - `loader.py`: Case parsing and batch loading.
+    - `concurrent_loader.py`: High-concurrency diagnostic processing.
+  - **`models/`**: AI models and expert pool management.
+    - `expert_pool.py`: EEP (Evolvable Expert Pool) management.
+  - **`retrieval/`**: Hybrid retrieval engine.
+    - `knowledge.py`: Unified interface for RAG, ACE, and Case libraries.
+    - `hybrid.py`: BM25 + Vector hybrid search implementation.
+  - **`prompt/`**: System prompt templates for each diagnostic step.
+  - `diagnosis.py`: Core multi-step diagnostic pipeline.
+  - `pipeline.py`: Simplified API interface.
+  - `trainer.py`: Genetic Algorithm evolution framework for expert prompts.
 
-### Key Files
+### Entry Point Scripts
 
-- `run_webui.sh`: Startup script for the Streamlit-based Web UI.
-- `requirements.txt`: Python package dependencies.
-- `README.md`: This project documentation.
+- `run_server.py`: FastAPI server for HTTP API.
+- `run_webui.py`: Streamlit-based graphical user interface.
+- `run_evo.py`: Modular evolution entry point.
+- `run_rag_build.py`: RAG index construction script.
+- `run_all.sh`: Automation script for full batch evolution.
+
+### Support Directories
+
+- **`config/`**: System and model configuration files (e.g., DeepSpeed).
+- **`outputs/`**: Generated reports and optimized expert pools.
+- **`data/`**: Raw and processed medical record data files.
+- **`docs/`**: Project documentation and references.
+- **`exp/`**: Experimental features and external integrations (e.g., A-Mem system).
 
 ## 📝 License
 

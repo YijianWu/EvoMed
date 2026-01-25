@@ -4,7 +4,7 @@
 set -e
 
 # Get parent directory of script location (project root)
-ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 cd "$ROOT_DIR"
 
 # Check virtual environment
@@ -42,7 +42,7 @@ for BATCH_ID in $(seq 1 $TOTAL_BATCHES); do
     
     if [ -n "$PREV_PLAYBOOK" ] && [ -f "$PREV_PLAYBOOK" ]; then
         echo "    Using previous playbook: $PREV_PLAYBOOK"
-        python scripts/run_modular_evolution.py \
+        python run_evo.py \
             --batch-id $BATCH_ID \
             --batch-size $BATCH_SIZE \
             --model-path gpt-4o-mini \
@@ -51,7 +51,7 @@ for BATCH_ID in $(seq 1 $TOTAL_BATCHES); do
             --previous-playbook "$PREV_PLAYBOOK"
     else
         echo "    First batch, no previous playbook"
-        python scripts/run_modular_evolution.py \
+        python run_evo.py \
             --batch-id $BATCH_ID \
             --batch-size $BATCH_SIZE \
             --model-path gpt-4o-mini \

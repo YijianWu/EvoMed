@@ -106,7 +106,7 @@ class KnowledgeRetriever:
         """Lazy load RAG retriever"""
         if self._rag_retriever is None and self.enable_rag:
             try:
-                from hybrid_retriever import HybridLLMRerankRetriever
+                from evomed.retrieval.hybrid import HybridLLMRerankRetriever
                 
                 if os.path.exists(self.rag_index_dir):
                     self._rag_retriever = HybridLLMRerankRetriever(

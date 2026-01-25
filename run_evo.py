@@ -31,7 +31,7 @@ ROOT = Path(__file__).resolve().parents[1]
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
-from ace import (
+from evomed.ace import (
     # Traditional components
     AdapterStepResult,
     Curator,
@@ -51,11 +51,11 @@ from ace import (
     ModularReflectorOutput,
     build_modular_excerpt,
 )
-from ace.delta import DeltaBatch, DeltaOperation
+from evomed.ace.delta import DeltaBatch, DeltaOperation
 
 # Import prompts
-from prompts import CURATOR_PROMPT
-from ace.roles import MODULAR_REFLECTOR_PROMPT
+from evomed.ace.prompts import CURATOR_PROMPT
+from evomed.ace.roles import MODULAR_REFLECTOR_PROMPT
 
 
 @dataclass

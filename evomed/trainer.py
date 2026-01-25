@@ -17,13 +17,13 @@ from typing import List, Dict, Tuple
 from dataclasses import dataclass
 
 # Import main process modules
-from main_diagnosis_pipeline import (
+from evomed.diagnosis import (
     DiagnosticPipeline,
     GeneticPromptOptimizer,
     PatientInfo,
     parse_patient_from_row
 )
-from system_step3_diag import system_step3_prompt
+from evomed.prompt.step3_diag import system_step3_prompt
 
 
 # Complete expert definition templates for 16 departments

@@ -14,11 +14,11 @@ import pandas as pd
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 
 # Simplified API
-from diagnosis_api import DiagnosisAPI, convert_patient_json_to_text
+from evomed.pipeline import DiagnosisAPI, convert_patient_json_to_text
 
 # Full Version API (import when needed)
 try:
-    from main_diagnosis_pipeline import DiagnosticPipeline, PatientInfo
+    from evomed.diagnosis import DiagnosticPipeline, PatientInfo
     FULL_VERSION_AVAILABLE = True
 except ImportError as e:
     st.warning(f"Full version unavailable: {e}")

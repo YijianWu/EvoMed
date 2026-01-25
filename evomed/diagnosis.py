@@ -14,16 +14,16 @@ from dataclasses import dataclass
 from openai import OpenAI
 import time
 
-from system_step1_route import system_step1_prompt
-from system_step2_ir import system_step2_prompt
-from system_step3_diag import system_step3_prompt
-from system_step4_agg import system_step4_prompt
+from evomed.prompt.step1_route import system_step1_prompt
+from evomed.prompt.step2_ir import system_step2_prompt
+from evomed.prompt.step3_diag import system_step3_prompt
+from evomed.prompt.step4_agg import system_step4_prompt
 
 # Import evolvable expert resource pool
-from expert_pool import EvolvingExpertPool, DiagnosticEpisode, ExpertUnit
+from evomed.models.expert_pool import EvolvingExpertPool, DiagnosticEpisode, ExpertUnit
 
 # Import knowledge retrieval services
-from knowledge_retriever import KnowledgeRetriever
+from evomed.retrieval.knowledge import KnowledgeRetriever
 
 API_BASE_URL = "https://yunwu.ai/v1"
 API_KEY = "sk-mZ1tJ8giPu2WqauY5SivguiTVJmFolWNAkBQ4i5Y3Lh2jxVL"
