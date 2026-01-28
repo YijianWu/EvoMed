@@ -11,7 +11,7 @@ from typing import Any, Dict, List, Optional, Sequence
 from .delta import DeltaBatch
 from .llm import LLMClient
 from .playbook import Playbook
-from .prompts import CURATOR_PROMPT, REFLECTOR_PROMPT
+from .prompts import CURATOR_PROMPT, MODULAR_REFLECTOR_PROMPT, REFLECTOR_PROMPT
 
 
 # ---------------------------------------------------------------------
@@ -331,57 +331,6 @@ def _make_playbook_excerpt(playbook: Playbook, bullet_ids: Sequence[str]) -> str
 # ---------------------------------------------------------------------
 # Modular Reflector: Supports reflection of modular experience and iterative module updates
 # ---------------------------------------------------------------------
-
-MODULAR_REFLECTOR_PROMPT = """\
-You are a senior clinical medical expert analyzing the diagnostic process of this case.
-Your tasks are:
-1. Evaluate the helpfulness of retrieved experiences for the diagnosis
-2. Based on the diagnostic experience of the current case, **update the iterative modules of the retrieved experiences**
-
-Question:
-{question}
-Model reasoning:
-{reasoning}
-Model prediction: {prediction}
-Ground truth (if available): {ground_truth}
-Feedback: {feedback}
-
-Retrieved relevant experiences (to be evaluated and updated):
-{modular_excerpts}
-
-**Important Tasks:**
-1. Evaluate each retrieved experience (helpful/harmful/neutral)
-2. If the current case provides new diagnostic uncertainty or hypotheses to be verified, update the iterative module of the corresponding experience
-
-Return JSON:
-{{
-  "reasoning": "<analysis of diagnostic process>",
-  "key_diagnostic_info": "<core diagnostic elements>",
-  "diagnostic_reasoning_path": "<diagnostic reasoning path>",
-  "correct_approach": "<correct diagnostic method>",
-  "key_insight": "<reusable medical insight>",
-  "bullet_tags": [
-    {{"id": "<bullet_id>", "tag": "helpful|harmful|neutral", "reason": "<short reason>"}}
-  ],
-  "mutable_updates": [
-    {{
-      "bullet_id": "<ID of experience to be updated>",
-      "uncertainty": {{
-        "primary_uncertainty": "<updated diagnostic uncertainty, omit if not updated>"
-      }},
-      "delayed_assumptions": {{
-        "pending_validations": ["<list of updated hypotheses to be verified>"]
-      }}
-    }}
-  ]
-}}
-
-Note:
-- mutable_updates only includes experiences that need updating, return empty array [] if none
-- Updates should be based on the diagnostic experience of the current case, supplementing or correcting original uncertainties and hypotheses to be verified
-- Retain valuable original content, only add or correct parts that need improvement
-"""
-
 
 @dataclass
 class MutableUpdate:
