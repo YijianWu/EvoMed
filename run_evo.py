@@ -31,12 +31,12 @@ ROOT = Path(__file__).resolve().parents[1]
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
-from evomed.ace import (
+from ace.ace import (
     # Traditional components
     AdapterStepResult,
     Curator,
     EnvironmentResult,
-    Generator,
+    GeneratorOutput,
     OfflineAdapter,
     Reflector,
     Sample,
@@ -51,11 +51,11 @@ from evomed.ace import (
     ModularReflectorOutput,
     build_modular_excerpt,
 )
-from evomed.ace.delta import DeltaBatch, DeltaOperation
+from ace.ace.delta import DeltaBatch, DeltaOperation
 
 # Import prompts
-from evomed.ace.prompts import CURATOR_PROMPT
-from evomed.ace.roles import MODULAR_REFLECTOR_PROMPT
+from ace.ace.prompts import CURATOR_PROMPT
+from ace.ace.roles import MODULAR_REFLECTOR_PROMPT
 
 
 @dataclass
@@ -230,7 +230,6 @@ def load_questions_batch(df: pd.DataFrame, batch_id: int, batch_size: int) -> Li
 
 def process_modular_sample(
     sample: QuestionSample,
-    generator: Generator,
     modular_reflector: ModularReflector,
     curator: Curator,
     environment: ModularEnvironment,
@@ -255,13 +254,24 @@ def process_modular_sample(
     max_retries = 3
     for attempt in range(1, max_retries + 1):
         try:
-            # 1. Generate diagnosis
-            generator_output = generator.generate(
-                question=sample.question,
-                context=sample.context,
-                playbook=modular_playbook,  # Compatibility parameter
-                reflection="",
-                **(sample.metadata or {})
+            # 1. Generate diagnosis (Directly from metadata)
+            metadata = sample.metadata or {}
+            most_likely = str(metadata.get("most_likely_diagnosis", ""))
+            rationale = str(metadata.get("diagnostic_rationale", ""))
+            bullet_ids = metadata.get("bullet_ids") or metadata.get("retrieved_bullet_ids") or []
+            if not isinstance(bullet_ids, list):
+                bullet_ids = []
+
+            generator_output = GeneratorOutput(
+                reasoning=rationale,
+                final_answer=most_likely,
+                bullet_ids=bullet_ids,
+                raw={
+                    "most_likely_diagnosis": most_likely,
+                    "diagnostic_rationale": rationale,
+                    "question": sample.question,
+                    "context": sample.context,
+                },
             )
 
             # 2. Environment assessment
@@ -591,7 +601,6 @@ def main() -> None:
     )
 
     # Initialize components
-    generator = Generator(llm=None)
     modular_reflector = ModularReflector(client, MODULAR_REFLECTOR_PROMPT)
     curator = Curator(client, CURATOR_PROMPT)
     environment = ModularEnvironment()
@@ -637,7 +646,6 @@ def main() -> None:
             executor.submit(
                 process_modular_sample,
                 sample,
-                generator,
                 modular_reflector,
                 curator,
                 environment,

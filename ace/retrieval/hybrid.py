@@ -67,8 +67,8 @@ import pickle
 @dataclass
 class HybridLLMRerankRetriever:
     index_dir: str = "./rag_index"
-    base_url: str = "https://yunwu.ai/v1"
-    api_key: Optional[str] = None
+    base_url: str = os.getenv("OPENAI_BASE_URL", "https://api.openai.com/v1")
+    api_key: Optional[str] = os.getenv("OPENAI_API_KEY", "")
     llm_model: str = "gpt-4o"
     embed_model: str = "text-embedding-3-large"
 

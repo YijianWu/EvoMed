@@ -12,8 +12,8 @@ if [ -d "venv" ]; then
     source venv/bin/activate
 fi
 
-export OPENAI_API_KEY="sk-mZ1tJ8giPu2WqauY5SivguiTVJmFolWNAkBQ4i5Y3Lh2jxVL"
-export OPENAI_BASE_URL="https://yunwu.ai/v1"
+export OPENAI_API_KEY="${OPENAI_API_KEY}"
+export OPENAI_BASE_URL="${OPENAI_BASE_URL:-https://api.openai.com/v1}"
 export HF_ENDPOINT="https://hf-mirror.com"
 
 EXCEL_FILE="guilin_inpatient_extracted_10000.xlsx"

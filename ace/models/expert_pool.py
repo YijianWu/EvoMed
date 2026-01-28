@@ -18,9 +18,9 @@ import hashlib
 
 
 # API Configuration
-API_BASE_URL = "https://yunwu.ai/v1"
-API_KEY = "sk-CCoYJEJcm2mL4YH7uRRw9DPgXQj2f8873F1D98uXtuwclUwW"
-EMBEDDING_MODEL = "text-embedding-3-small"
+API_BASE_URL = os.getenv("OPENAI_BASE_URL", "https://api.openai.com/v1")
+API_KEY = os.getenv("OPENAI_API_KEY", "")
+EMBEDDING_MODEL = os.getenv("OPENAI_EMBEDDING_MODEL", "text-embedding-3-small")
 
 
 @dataclass

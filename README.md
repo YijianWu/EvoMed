@@ -11,9 +11,9 @@ EvoMed is a high-performance medical auxiliary diagnosis system based on an **Ev
 
 ## 📁 Repository Structure
 
-### Core Package (`evomed/`)
+### Core Package (`ace/`)
 
-- **`evomed/`**: The main Python package.
+- **`ace/`**: The main Python package.
   - **`ace/`**: Modular Experience Library (ACE) core logic.
     - `playbook.py`: Structured clinical experience storage.
     - `retrieval.py`: Semantic and modular retrievers.

@@ -292,9 +292,9 @@ V. Suggested Examinations or Tests
 - Only integrate directions already mentioned by experts.
 """
 
-API_BASE_URL = "https://yunwu.ai/v1"
-API_KEY = "sk-mZ1tJ8giPu2WqauY5SivguiTVJmFolWNAkBQ4i5Y3Lh2jxVL"
-MODEL_NAME = "gpt-4o"
+API_BASE_URL = os.getenv("OPENAI_BASE_URL", "https://api.openai.com/v1")
+API_KEY = os.getenv("OPENAI_API_KEY", "")
+MODEL_NAME = os.getenv("OPENAI_MODEL_NAME", "gpt-4o")
 
 def get_default_expert_pool_path():
     env_path = os.environ.get("EXPERT_POOL_PATH")

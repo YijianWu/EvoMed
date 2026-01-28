@@ -14,20 +14,20 @@ from dataclasses import dataclass
 from openai import OpenAI
 import time
 
-from evomed.prompt.step1_route import system_step1_prompt
-from evomed.prompt.step2_ir import system_step2_prompt
-from evomed.prompt.step3_diag import system_step3_prompt
-from evomed.prompt.step4_agg import system_step4_prompt
+from ace.prompt.step1_route import system_step1_prompt
+from ace.prompt.step2_ir import system_step2_prompt
+from ace.prompt.step3_diag import system_step3_prompt
+from ace.prompt.step4_agg import system_step4_prompt
 
 # Import evolvable expert resource pool
-from evomed.models.expert_pool import EvolvingExpertPool, DiagnosticEpisode, ExpertUnit
+from ace.models.expert_pool import EvolvingExpertPool, DiagnosticEpisode, ExpertUnit
 
 # Import knowledge retrieval services
-from evomed.retrieval.knowledge import KnowledgeRetriever
+from ace.retrieval.knowledge import KnowledgeRetriever
 
-API_BASE_URL = "https://yunwu.ai/v1"
-API_KEY = "sk-mZ1tJ8giPu2WqauY5SivguiTVJmFolWNAkBQ4i5Y3Lh2jxVL"
-MODEL_NAME = "gpt-4o"
+API_BASE_URL = os.getenv("OPENAI_BASE_URL", "https://api.openai.com/v1")
+API_KEY = os.getenv("OPENAI_API_KEY", "")
+MODEL_NAME = os.getenv("OPENAI_MODEL_NAME", "gpt-4o")
 
 EXPERTS_CONFIG = [
     {

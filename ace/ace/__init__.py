@@ -16,7 +16,6 @@ from .playbook import (
 from .delta import DeltaOperation, DeltaBatch
 from .llm import LLMClient, DummyLLMClient, UniversalLLMClient
 from .roles import (
-    Generator,
     Reflector,
     Curator,
     GeneratorOutput,
@@ -66,7 +65,6 @@ __all__ = [
     "DummyLLMClient",
     "UniversalLLMClient",
     # Traditional roles
-    "Generator",
     "Reflector",
     "Curator",
     "GeneratorOutput",

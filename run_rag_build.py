@@ -48,9 +48,9 @@ logging.basicConfig(
 )
 
 # ====== API Configuration ======
-BASE_URL = os.getenv("YUNWU_BASE_URL", "https://yunwu.ai/v1")
-API_KEY  = os.getenv("YUNWU_API_KEY") or "sk-CCoYJEJcm2mL4YH7uRRw9DPgXQj2f8873F1D98uXtuwclUwW"
-EMBED_MODEL = os.getenv("RAG_EMBED_MODEL", "text-embedding-3-large")
+BASE_URL = os.getenv("OPENAI_BASE_URL", "https://api.openai.com/v1")
+API_KEY  = os.getenv("OPENAI_API_KEY", "")
+EMBED_MODEL = os.getenv("OPENAI_EMBEDDING_MODEL", "text-embedding-3-large")
 
 if not API_KEY:
     raise RuntimeError("Environment variable YUNWU_API_KEY is not set.")

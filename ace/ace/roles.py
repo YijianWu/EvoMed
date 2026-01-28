@@ -11,7 +11,7 @@ from typing import Any, Dict, List, Optional, Sequence
 from .delta import DeltaBatch
 from .llm import LLMClient
 from .playbook import Playbook
-from .prompts import CURATOR_PROMPT, GENERATOR_PROMPT, REFLECTOR_PROMPT
+from .prompts import CURATOR_PROMPT, REFLECTOR_PROMPT
 
 
 # ---------------------------------------------------------------------
@@ -66,85 +66,18 @@ def _format_optional(value: Optional[str]) -> str:
 
 
 # ---------------------------------------------------------------------
-# Generator
+# Generator Output
 # ---------------------------------------------------------------------
 
 @dataclass
 class GeneratorOutput:
     """
-    Results of the generation stage (whether inferred by LLM or fed in by our external system).
+    Results of the diagnosis stage (passed in from external system).
     """
     reasoning: str         # Our diagnostic rationale
     final_answer: str      # Our final diagnosis (most likely diagnosis)
     bullet_ids: List[str]  # Not used for now, defaulted to []
     raw: Dict[str, Any]    # Raw full information, accessible by Reflector / Curator later
-
-class Generator:
-    """
-    Clinical customized Generator:
-    - No longer calls LLM.
-    - Directly uses the structured diagnostic results we already have.
-    - reasoning = diagnostic_rationale
-    - final_answer = most_likely_diagnosis
-    - bullet_ids: use passed in ones or empty list.
-    """
-
-    def __init__(
-        self,
-        llm: Optional[LLMClient] = None,
-        prompt_template: str = GENERATOR_PROMPT,
-        *,
-        max_retries: int = 3,
-    ) -> None:
-        # Keep parameters for compatibility, but won't actually use LLM for generation
-        self.llm = llm
-        self.prompt_template = prompt_template
-        self.max_retries = max_retries
-
-    def generate(
-        self,
-        *,
-        question: str,
-        context: Optional[str],
-        playbook: Playbook,
-        reflection: Optional[str] = None,
-        **kwargs: Any,
-    ) -> GeneratorOutput:
-        """
-        No longer call LLM based on prompt, but directly use content in kwargs.
-        These kwargs are passed in via AdapterBase._process_sample() through sample.metadata.
-
-        Required keys:
-          - most_likely_diagnosis      (string)
-          - diagnostic_rationale       (string)
-          - bullet_ids                 (list[str], optional)
-        """
-
-        most_likely = kwargs.get("most_likely_diagnosis", "")
-        rationale   = kwargs.get("diagnostic_rationale", "")
-        bullet_ids = kwargs.get("bullet_ids") or kwargs.get("retrieved_bullet_ids") or []
-
-        # Fallback for types to avoid errors when not string/list
-        if not isinstance(most_likely, str):
-            most_likely = str(most_likely)
-        if not isinstance(rationale, str):
-            rationale = str(rationale)
-        if not isinstance(bullet_ids, list):
-            bullet_ids = []
-
-        raw_data: Dict[str, Any] = {
-            "most_likely_diagnosis": most_likely,
-            "diagnostic_rationale": rationale,
-            "question": question,
-            "context": context,
-        }
-
-        return GeneratorOutput(
-            reasoning=rationale,
-            final_answer=most_likely,
-            bullet_ids=bullet_ids,
-            raw=raw_data,
-        )
 
 
 # ---------------------------------------------------------------------

@@ -8,7 +8,7 @@ from dataclasses import dataclass, field
 from typing import Dict, Iterable, List, Optional, Sequence
 
 from .playbook import Playbook
-from .roles import Curator, CuratorOutput, Generator, GeneratorOutput, Reflector, ReflectorOutput
+from .roles import Curator, CuratorOutput, GeneratorOutput, Reflector, ReflectorOutput
 
 
 @dataclass
@@ -57,14 +57,12 @@ class AdapterBase:
         self,
         *,
         playbook: Optional[Playbook] = None,
-        generator: Generator,
         reflector: Reflector,
         curator: Curator,
         max_refinement_rounds: int = 1,
         reflection_window: int = 3,
     ) -> None:
         self.playbook = playbook or Playbook()
-        self.generator = generator
         self.reflector = reflector
         self.curator = curator
         self.max_refinement_rounds = max_refinement_rounds
@@ -125,12 +123,23 @@ class AdapterBase:
         step_index: int,
         total_steps: int,
     ) -> AdapterStepResult:
-        generator_output = self.generator.generate(
-            question=sample.question,
-            context=sample.context,
-            playbook=self.playbook,
-            reflection=self._reflection_context(),
-            **(sample.metadata or {}),   # <<--- Critical: pass patient's AI diagnosis to Generator
+        metadata = sample.metadata or {}
+        most_likely = str(metadata.get("most_likely_diagnosis", ""))
+        rationale = str(metadata.get("diagnostic_rationale", ""))
+        bullet_ids = metadata.get("bullet_ids") or metadata.get("retrieved_bullet_ids") or []
+        if not isinstance(bullet_ids, list):
+            bullet_ids = []
+
+        generator_output = GeneratorOutput(
+            reasoning=rationale,
+            final_answer=most_likely,
+            bullet_ids=bullet_ids,
+            raw={
+                "most_likely_diagnosis": most_likely,
+                "diagnostic_rationale": rationale,
+                "question": sample.question,
+                "context": sample.context,
+            },
         )
         env_result = environment.evaluate(sample, generator_output)
         reflection = self.reflector.reflect(
