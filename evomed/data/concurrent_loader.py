@@ -16,7 +16,7 @@ from dataclasses import dataclass, asdict
 from concurrent.futures import ThreadPoolExecutor, as_completed
 import threading
 
-from ace.diagnosis import (
+from evomed.diagnosis import (
     DiagnosticPipeline, 
     PatientInfo,
     API_KEY, 

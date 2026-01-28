@@ -62,7 +62,7 @@ class KnowledgeRetriever:
         enable_experience: bool = True,
         enable_case: bool = True,
         rag_index_dir: str = "./rag/rag_index",
-        memory_db_root: str = "./exp/A-mem-sys/A-mem-sys/memory_db",
+        memory_db_root: str = "./exp/amem/memory_db",
         experience_collection: str = "experience_100000",
         case_collection: str = "case_100000",
         api_key: str = API_KEY,
@@ -106,7 +106,7 @@ class KnowledgeRetriever:
         """Lazy load RAG retriever"""
         if self._rag_retriever is None and self.enable_rag:
             try:
-                from ace.retrieval.hybrid import HybridLLMRerankRetriever
+                from evomed.retrieval.hybrid import HybridLLMRerankRetriever
                 
                 if os.path.exists(self.rag_index_dir):
                     self._rag_retriever = HybridLLMRerankRetriever(

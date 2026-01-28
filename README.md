@@ -11,25 +11,20 @@ EvoMed is a high-performance medical auxiliary diagnosis system based on an **Ev
 
 ## 📁 Repository Structure
 
-### Core Package (`ace/`)
+### Core Package (`evomed/`)
 
-- **`ace/`**: The main Python package.
-  - **`ace/`**: Modular Experience Library (ACE) core logic.
-    - `playbook.py`: Structured clinical experience storage.
-    - `retrieval.py`: Semantic and modular retrievers.
-    - `roles.py`: AI agent roles (Generator, Reflector, Curator).
+- **`evomed/`**: The main Python package containing all source code.
+  - **`evomem/`**: Memory and experience management.
+    - **`generate/`**: Modular Experience Library (ACE) core logic.
+    - **`storage/`**: Agentic Memory (A-Mem) storage and retrieval logic.
+  - **`evoexperts/`**: Genetic Algorithm (GA) evolution framework for expert prompts.
   - **`data/`**: Data processing and loading modules.
-    - `loader.py`: Case parsing and batch loading.
-    - `concurrent_loader.py`: High-concurrency diagnostic processing.
   - **`models/`**: AI models and expert pool management.
-    - `expert_pool.py`: EEP (Evolvable Expert Pool) management.
-  - **`retrieval/`**: Hybrid retrieval engine.
-    - `knowledge.py`: Unified interface for RAG, ACE, and Case libraries.
-    - `hybrid.py`: BM25 + Vector hybrid search implementation.
+  - **`retrieval/`**: Hybrid retrieval engine (RAG, ACE, and Case libraries).
   - **`prompt/`**: System prompt templates for each diagnostic step.
   - `diagnosis.py`: Core multi-step diagnostic pipeline.
   - `pipeline.py`: Simplified API interface.
-  - `trainer.py`: Genetic Algorithm evolution framework for expert prompts.
+  - `trainer.py`: GA training orchestration.
 
 ### Entry Point Scripts
 
@@ -43,9 +38,7 @@ EvoMed is a high-performance medical auxiliary diagnosis system based on an **Ev
 
 - **`config/`**: System and model configuration files (e.g., DeepSpeed).
 - **`outputs/`**: Generated reports and optimized expert pools.
-- **`data/`**: Raw and processed medical record data files.
 - **`docs/`**: Project documentation and references.
-- **`exp/`**: Experimental features and external integrations (e.g., A-Mem system).
 
 ## 📝 License
 

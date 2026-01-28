@@ -8,22 +8,23 @@ Supports three expert activation modes:
 """
 
 import json
+import os
 import pandas as pd
 from typing import Dict, List, Optional, Any, Tuple
 from dataclasses import dataclass
 from openai import OpenAI
 import time
 
-from ace.prompt.step1_route import system_step1_prompt
-from ace.prompt.step2_ir import system_step2_prompt
-from ace.prompt.step3_diag import system_step3_prompt
-from ace.prompt.step4_agg import system_step4_prompt
+from evomed.prompt.step1_route import system_step1_prompt
+from evomed.prompt.step2_ir import system_step2_prompt
+from evomed.prompt.step3_diag import system_step3_prompt
+from evomed.prompt.step4_agg import system_step4_prompt
 
 # Import evolvable expert resource pool
-from ace.models.expert_pool import EvolvingExpertPool, DiagnosticEpisode, ExpertUnit
+from evomed.models.expert_pool import EvolvingExpertPool, DiagnosticEpisode, ExpertUnit
 
 # Import knowledge retrieval services
-from ace.retrieval.knowledge import KnowledgeRetriever
+from evomed.retrieval.knowledge import KnowledgeRetriever
 
 API_BASE_URL = os.getenv("OPENAI_BASE_URL", "https://api.openai.com/v1")
 API_KEY = os.getenv("OPENAI_API_KEY", "")
@@ -147,7 +148,7 @@ EXPERTS_CONFIG = [
 
 @dataclass
 class PatientInfo:
-    """Patient Information Data Class"""
+    \"\"\"Patient Information Data Class\"\"\"
     patient_id: str
     gender: str
     age: int
@@ -163,8 +164,8 @@ class PatientInfo:
     main_diagnosis_icd: str
     
     def to_prompt_string(self) -> str:
-        """Formats patient info into a prompt string"""
-        return f"""
+        \"\"\"Formats patient info into a prompt string\"\"\"
+        return f\"\"\"
 Patient ID: {self.patient_id}
 Gender: {self.gender}
 Age: {self.age} years old
@@ -190,11 +191,11 @@ Admitting Department: {self.department}
 
 [Imaging Results]
 {self.imaging}
-"""
+\"\"\"
 
 
 class DiagnosticPipeline:
-    """
+    \"\"\"
     Multi-Disciplinary Diagnostic Pipeline
     
     Supports three expert activation modes:
@@ -206,7 +207,7 @@ class DiagnosticPipeline:
     - RAG Medical Guideline Retrieval
     - Experience Library Retrieval (A-Mem)
     - Case Library Retrieval (ACE)
-    """
+    \"\"\"
     
     def __init__(
         self, 
@@ -217,7 +218,7 @@ class DiagnosticPipeline:
         enable_experience: bool = True,
         enable_case: bool = True,
         rag_index_dir: str = "rag/rag_index",
-        memory_db_root: str = "exp/A-mem-sys/A-mem-sys/memory_db",
+        memory_db_root: str = "exp/amem/memory_db",
         experience_collection: str = "experience_100000",
         case_collection: str = "case_100000",
     ):
@@ -226,10 +227,10 @@ class DiagnosticPipeline:
             base_url=API_BASE_URL
         )
         self.activation_mode = activation_mode
-        self.resource = """[Medical Resources]
+        self.resource = \"\"\"[Medical Resources]
 Available Departments: Internal Medicine, Surgery, Emergency, Cardiology, Gastroenterology, Respiratory, Neurology, Oncology, Orthopedics, Urology, Hepatobiliary Surgery, OB/GYN, Pediatrics, etc.
 Knowledge Bases: Medical Guidelines, Clinical Experience Library, Similar Case Library.
-Note: This system provides diagnostic assistance only and does not replace professional medical activities."""
+Note: This system provides diagnostic assistance only and does not replace professional medical activities.\"\"\"
         
         # Initialize Evolvable Expert Pool (EEP)
         if activation_mode == "eep_semantic":
@@ -270,8 +271,7 @@ Note: This system provides diagnostic assistance only and does not replace profe
         self.specialty_mapping = self._build_specialty_mapping()
     
     def _load_evolved_pool(self, path: str) -> Optional[List[Dict]]:
-        """Loads the expert pool evolved via genetic algorithms"""
-        import os
+        \"\"\"Loads the expert pool evolved via genetic algorithms\"\"\"
         if not os.path.exists(path):
             print(f"  Warning: Evolved pool file does not exist: {path}")
             return None
@@ -304,7 +304,7 @@ Note: This system provides diagnostic assistance only and does not replace profe
             return None
     
     def _build_specialty_mapping(self) -> Dict[str, Dict]:
-        """Builds a specialty name mapping table, supporting various aliases"""
+        \"\"\"Builds a specialty name mapping table, supporting various aliases\"\"\"
         mapping = {}
         
         # Alias mapping (English)
@@ -337,8 +337,8 @@ Note: This system provides diagnostic assistance only and does not replace profe
         return mapping
     
     def _extract_recommended_specialties(self, step1_output: str) -> List[str]:
-        """Extracts recommended specialties from Step-1 output"""
-        extract_prompt = f"""From the following consultation/referral suggestions, extract all recommended specialty/department names.
+        \"\"\"Extracts recommended specialties from Step-1 output\"\"\"
+        extract_prompt = f\"\"\"From the following consultation/referral suggestions, extract all recommended specialty/department names.
 
 [Step-1 Output]
 {step1_output}
@@ -348,14 +348,14 @@ Note: This system provides diagnostic assistance only and does not replace profe
 
 Please output the list of specialty names in order of priority.
 Output in JSON array format ONLY, without any explanation. Example: ["Gastrointestinal Surgery", "Cardiology", "Respiratory Medicine"]
-"""
+\"\"\"
         
         result = self._call_llm(extract_prompt)
         
         try:
             result = result.strip()
             if result.startswith("```"):
-                result = result.split("\n", 1)[1]
+                result = result.split("\\n", 1)[1]
             if result.endswith("```"):
                 result = result.rsplit("```", 1)[0]
             result = result.strip()
@@ -369,7 +369,7 @@ Output in JSON array format ONLY, without any explanation. Example: ["Gastrointe
         return self._fallback_extract_specialties(step1_output)
     
     def _fallback_extract_specialties(self, text: str) -> List[str]:
-        """Fallback: Extract specialties via keyword matching"""
+        \"\"\"Fallback: Extract specialties via keyword matching\"\"\"
         found = []
         for specialty in self.specialty_mapping.keys():
             if specialty in text and specialty not in found:
@@ -379,7 +379,7 @@ Output in JSON array format ONLY, without any explanation. Example: ["Gastrointe
         return found
     
     def _match_experts_by_specialties(self, specialties: List[str]) -> List[Dict]:
-        """Matches expert configurations based on the specialty name list"""
+        \"\"\"Matches expert configurations based on the specialty name list\"\"\"
         matched_experts = []
         matched_ids = set()
         
@@ -402,7 +402,7 @@ Output in JSON array format ONLY, without any explanation. Example: ["Gastrointe
         return matched_experts
     
     def _call_llm(self, system_prompt: str, max_retries: int = 3) -> str:
-        """Calls the LLM API"""
+        \"\"\"Calls the LLM API\"\"\"
         for attempt in range(max_retries):
             try:
                 response = self.client.chat.completions.create(
@@ -423,12 +423,12 @@ Output in JSON array format ONLY, without any explanation. Example: ["Gastrointe
                     raise
     
     def step1_route(self, patient: PatientInfo) -> Dict[str, Any]:
-        """
+        \"\"\"
         Step-1: Consultation/Referral Planning
         Input: Medical Resources r, Patient Info p
         Output: Priority list of specialties, urgency level, high-risk exclusion list
-        """
-        print("\n" + "="*60)
+        \"\"\"
+        print("\\n" + "="*60)
         print("[Step-1] Consultation/Referral Planning")
         print("="*60)
         
@@ -446,17 +446,17 @@ Output in JSON array format ONLY, without any explanation. Example: ["Gastrointe
         }
     
     def step2_semantic_rewrite(self, patient: PatientInfo, expert: Dict) -> Dict[str, Any]:
-        """
+        \"\"\"
         Step-2: Expert Semantic Rewriting
         Input: Medical Resources r, Patient Info p, Expert Config e
         Output: Medical-style rewritten segment, structured retrieval element summary
-        """
-        expert_info = f"""
+        \"\"\"
+        expert_info = f\"\"\"
 Expert Role: {expert['name']}
 Specialty: {expert['specialty']}
 Description: {expert['description']}
 Focus Areas: {', '.join(expert['focus_areas'])}
-"""
+\"\"\"
         
         prompt = system_step2_prompt.format(
             resource=self.resource,
@@ -477,12 +477,12 @@ Focus Areas: {', '.join(expert['focus_areas'])}
                         rewritten_info: str, reference: str = "",
                         auto_retrieve: bool = True,
                         custom_prompt_template: Optional[str] = None) -> Dict[str, Any]:
-        """
+        \"\"\"
         Step-3: Expert Differential Diagnosis
         Input: Medical Resources r, Patient Info p, Expert Config e, Reference ref
         Output: List of differential diagnoses, risks and warning signals, next examination directions
-        """
-        expert_info = f"""
+        \"\"\"
+        expert_info = f\"\"\"
 Expert Role: {expert['name']}
 Specialty: {expert['specialty']}
 Description: {expert['description']}
@@ -490,7 +490,7 @@ Focus Areas: {', '.join(expert['focus_areas'])}
 
 [Rewritten Patient Info from Expert's Perspective]
 {rewritten_info}
-"""
+\"\"\"
         
         # Reference retrieval
         if not reference and auto_retrieve:
@@ -526,25 +526,25 @@ Focus Areas: {', '.join(expert['focus_areas'])}
     
     def step4_aggregate(self, patient: PatientInfo, 
                         expert_opinions: List[Dict[str, Any]]) -> Dict[str, Any]:
-        """
+        \"\"\"
         Step-4: Multi-Expert Consensus Aggregation
         Input: Medical Resources r, Patient Info p, Collection of Expert Opinions
         Output: Comprehensive diagnostic conclusion, explanation of disagreements, comprehensive risk assessment, next action suggestions
-        """
-        print("\n" + "="*60)
+        \"\"\"
+        print("\\n" + "="*60)
         print("[Step-4] Multi-Expert Consensus Aggregation")
         print("="*60)
         
         # Aggregate all expert opinions
         experts_summary = ""
         for opinion in expert_opinions:
-            experts_summary += f"""
+            experts_summary += f\"\"\"
 {'='*40}
 Diagnostic Opinion from [{opinion['expert_name']}]
 {'='*40}
 {opinion['output']}
 
-"""
+\"\"\"
         
         prompt = system_step4_prompt.format(
             resource=self.resource,
@@ -561,7 +561,7 @@ Diagnostic Opinion from [{opinion['expert_name']}]
         }
     
     def _expert_unit_to_dict(self, expert_unit: ExpertUnit) -> Dict:
-        """Converts ExpertUnit to a compatible dictionary format"""
+        \"\"\"Converts ExpertUnit to a compatible dictionary format\"\"\"
         return {
             'id': expert_unit.id,
             'name': expert_unit.name,
@@ -579,14 +579,14 @@ Diagnostic Opinion from [{opinion['expert_name']}]
         step1_output: str = "",
         step1_weight: float = 0.3
     ) -> Tuple[List[Dict], DiagnosticEpisode]:
-        """
+        \"\"\"
         Selects experts using EEP hybrid activation mode
         
         Combines two signals:
         1. EEP Semantic Activation (1 - step1_weight): Based on Episode semantic similarity
         2. Step-1 Route Recommendation (step1_weight): Based on LLM consultation suggestions
-        """
-        print("\n" + "-"*60)
+        \"\"\"
+        print("\\n" + "-"*60)
         print(f"[EEP Hybrid Activation] Semantic Activation + Step-1 Routing (Weight: {step1_weight:.0%})")
         print("-"*60)
         
@@ -618,10 +618,10 @@ Diagnostic Opinion from [{opinion['expert_name']}]
         return selected_experts, episode
     
     def _activate_experts_step1(self, step1_output: str) -> List[Dict]:
-        """
+        \"\"\"
         Selects experts using pure Step-1 routing mode
-        """
-        print("\n" + "-"*60)
+        \"\"\"
+        print("\\n" + "-"*60)
         print("[Step-1 Routing] Matching experts based on consultation suggestions...")
         print("-"*60)
         
@@ -647,10 +647,10 @@ Diagnostic Opinion from [{opinion['expert_name']}]
         top_k: int = 5,
         selection_strategy: str = "hybrid"
     ) -> Tuple[List[Dict], List[Dict]]:
-        """
+        \"\"\"
         Activates experts using the evolved expert pool
-        """
-        print("\n" + "-"*60)
+        \"\"\"
+        print("\\n" + "-"*60)
         print(f"[Evolved Pool Activation] Selection Strategy: {selection_strategy}")
         print("-"*60)
         
@@ -714,7 +714,7 @@ Diagnostic Opinion from [{opinion['expert_name']}]
     
     def run_pipeline(self, patient: PatientInfo, top_k: int = 8, 
                      evolved_selection_strategy: str = "hybrid") -> Dict[str, Any]:
-        """Runs the complete four-step pipeline"""
+        \"\"\"Runs the complete four-step pipeline\"\"\"
         results = {
             "patient_id": patient.patient_id,
             "activation_mode": self.activation_mode,
@@ -770,18 +770,18 @@ Diagnostic Opinion from [{opinion['expert_name']}]
                 "selected_experts": [e['name'] for e in selected_experts]
             }
         
-        print(f"\nActivated Experts ({len(selected_experts)}): {[e['name'] for e in selected_experts]}")
+        print(f"\\nActivated Experts ({len(selected_experts)}): {[e['name'] for e in selected_experts]}")
         
         # Step-2 & Step-3
         expert_opinions = []
         
         for idx, expert in enumerate(selected_experts):
-            print("\n" + "-"*60)
+            print("\\n" + "-"*60)
             print(f"[Step-2 & Step-3] [{idx+1}/{len(selected_experts)}] {expert['name']} Analyzing...")
             print("-"*60)
             
             step2_result = self.step2_semantic_rewrite(patient, expert)
-            print(f"\n[{expert['name']}] Semantic rewriting complete")
+            print(f"\\n[{expert['name']}] Semantic rewriting complete")
             
             custom_prompt = None
             evolved_prompt_id = None
@@ -795,7 +795,7 @@ Diagnostic Opinion from [{opinion['expert_name']}]
                 step2_result["output"],
                 custom_prompt_template=custom_prompt
             )
-            print(f"\n[{expert['name']}] Differential Diagnosis:")
+            print(f"\\n[{expert['name']}] Differential Diagnosis:")
             print(step3_result["output"])
             
             opinion_record = {
@@ -840,12 +840,12 @@ Diagnostic Opinion from [{opinion['expert_name']}]
                                             episode: DiagnosticEpisode, 
                                             expert_opinions: List[Dict],
                                             results: Dict) -> Optional[Dict]:
-        """Detects diagnostic divergence, generates new experts, and performs re-analysis"""
-        print("\n" + "-"*60)
+        \"\"\"Detects diagnostic divergence, generates new experts, and performs re-analysis\"\"\"
+        print("\\n" + "-"*60)
         print("[Step-5] Divergence Detection and Expert Evolution")
         print("-"*60)
         
-        detect_prompt = f"""Analyze the following multi-expert consensus aggregation result and determine if a new expert perspective should be introduced.
+        detect_prompt = f\"\"\"Analyze the following multi-expert consensus aggregation result and determine if a new expert perspective should be introduced.
 
 [Step-4 Aggregation Result]
 {step4_output}
@@ -868,13 +868,13 @@ Output in JSON format:
     "evolution_priority": "high/medium/low/none"
 }}
 
-Output JSON only."""
+Output JSON only.\"\"\"
         
         try:
             result = self._call_llm(detect_prompt)
             result = result.strip()
             if result.startswith("```"):
-                result = result.split("\n", 1)[1]
+                result = result.split("\\n", 1)[1]
             if result.endswith("```"):
                 result = result.rsplit("```", 1)[0]
             
@@ -888,7 +888,7 @@ Output JSON only."""
             if (analysis.get('has_significant_divergence') and 
                 analysis.get('evolution_priority') in ['high', 'medium']):
                 
-                print(f"\nSignificant divergence detected, attempting to generate new expert...")
+                print(f"\\nSignificant divergence detected, attempting to generate new expert...")
                 print(f"  - Missing perspective: {analysis.get('missing_perspective', 'Unknown')}")
                 print(f"  - Suggested expert: {analysis.get('suggested_new_expert', 'Unknown')}")
                 
@@ -902,20 +902,20 @@ Output JSON only."""
                 new_expert = self.expert_pool.evolve_from_divergence(divergence_info, episode)
                 
                 if new_expert:
-                    print(f"\n✅ Successfully generated new expert unit: {new_expert.name}")
+                    print(f"\\n✅ Successfully generated new expert unit: {new_expert.name}")
                     print(f"   Specialty: {new_expert.specialty}")
                     print(f"   Focus Areas: {', '.join(new_expert.focus_areas)}")
                     
-                    print("\n" + "="*60)
+                    print("\\n" + "="*60)
                     print(f"[New Expert Participation] {new_expert.name} joining consultation")
                     print("="*60)
                     
                     new_expert_dict = self._expert_unit_to_dict(new_expert)
                     
-                    print(f"\n[{new_expert.name}] Performing semantic rewriting...")
+                    print(f"\\n[{new_expert.name}] Performing semantic rewriting...")
                     step2_new = self.step2_semantic_rewrite(patient, new_expert_dict)
                     
-                    print(f"\n[{new_expert.name}] Performing differential diagnosis...")
+                    print(f"\\n[{new_expert.name}] Performing differential diagnosis...")
                     step3_new = self.step3_diagnosis(patient, new_expert_dict, step2_new["output"])
                     
                     new_opinion = {
@@ -931,7 +931,7 @@ Output JSON only."""
                     all_opinions = expert_opinions + [new_opinion]
                     results["steps"]["expert_opinions"] = all_opinions
                     
-                    print("\n" + "="*60)
+                    print("\\n" + "="*60)
                     print("[Step-4 Re-aggregation] Aggregation with new expert opinion")
                     print("="*60)
                     
@@ -953,7 +953,7 @@ Output JSON only."""
                         "reanalysis_performed": True
                     }
                 else:
-                    print(f"\n⚠️ Failed to generate new expert (may duplicate existing expert)")
+                    print(f"\\n⚠️ Failed to generate new expert (may duplicate existing expert)")
                     return {
                         "divergence_detected": True,
                         "analysis": analysis,
@@ -974,7 +974,7 @@ Output JSON only."""
 
 
 def parse_patient_from_row(row: pd.Series) -> PatientInfo:
-    """Parses patient information from a DataFrame row"""
+    \"\"\"Parses patient information from a DataFrame row\"\"\"
     history_str = row.get('history_clean', row.get('history', '{}'))
     if pd.isna(history_str):
         history_str = '{}'
@@ -1032,405 +1032,6 @@ def parse_patient_from_row(row: pd.Series) -> PatientInfo:
     )
 
 
-class GeneticPromptOptimizer:
-    """
-    Genetic Algorithm Optimizer: Evolves system prompts for diagnostic agents
-    """
-    
-    def __init__(self, base_prompt: str, pipeline: DiagnosticPipeline, 
-                 population_size: int = 32, elitism_count: int = 6):
-        self.base_prompt = base_prompt
-        self.pipeline = pipeline
-        self.client = pipeline.client
-        self.population_size = population_size
-        self.elitism_count = elitism_count
-        self.population = []
-        self.generation = 0
-        self.best_individual = None
-        self.hall_of_fame = []
-        self.step2_cache = {}
-        self.expert_match_cache = {}
-        self.fitness_history = []
-        self.stagnation_count = 0
-        self.max_stagnation = 3
-        
-    def _get_matched_expert(self, patient: PatientInfo) -> Dict:
-        """Intelligent expert matching based on patient department and symptoms"""
-        if patient.patient_id in self.expert_match_cache:
-            return self.expert_match_cache[patient.patient_id]
-            
-        department = patient.department.lower()
-        for expert in self.pipeline.experts:
-            if any(dept in department for dept in [expert['specialty'].lower(), expert['name'].lower()]):
-                self.expert_match_cache[patient.patient_id] = expert
-                return expert
-        
-        for expert in self.pipeline.experts:
-            if expert['id'] == 'general_practice':
-                self.expert_match_cache[patient.patient_id] = expert
-                return expert
-                
-        self.expert_match_cache[patient.patient_id] = self.pipeline.experts[0]
-        return self.pipeline.experts[0]
-        
-    def initialize_population(self):
-        """Initializes population with diverse variants of the base prompt"""
-        print(f"Initializing population (Size: {self.population_size})...")
-        
-        self.population.append({
-            'id': 'gen0_original',
-            'prompt': self.base_prompt,
-            'fitness': 0.0,
-            'stats': {}
-        })
-        
-        for i in range(1, self.population_size):
-            try:
-                print(f"  - Generating initial individual {i}/{self.population_size}...")
-                mutated_prompt = self._mutate_prompt(self.base_prompt, intensity="high")
-                self.population.append({
-                    'id': f'gen0_ind{i}',
-                    'prompt': mutated_prompt,
-                    'fitness': 0.0,
-                    'stats': {}
-                })
-            except Exception as e:
-                print(f"    Warning: Failed to generate individual {i}: {e}, using original prompt")
-                self.population.append({
-                    'id': f'gen0_ind{i}_fallback',
-                    'prompt': self.base_prompt,
-                    'fitness': 0.0,
-                    'stats': {}
-                })
-                
-    def evaluate_fitness(self, validation_patients: List[PatientInfo], 
-                         sample_size: int = 5) -> None:
-        """Evaluates population fitness using stratified sampling and caching"""
-        print(f"\nStarting fitness evaluation for generation {self.generation} (Sample size: {sample_size})...")
-        
-        dept_groups = {}
-        for p in validation_patients:
-            dept = p.department
-            if dept not in dept_groups:
-                dept_groups[dept] = []
-            dept_groups[dept].append(p)
-            
-        eval_batch = []
-        depts = list(dept_groups.keys())
-        import random
-        random.shuffle(depts)
-        
-        while len(eval_batch) < sample_size and len(depts) > 0:
-            for dept in depts[:]:
-                if len(dept_groups[dept]) > 0:
-                    p = random.choice(dept_groups[dept])
-                    if p not in eval_batch:
-                        eval_batch.append(p)
-                        dept_groups[dept].remove(p) 
-                else:
-                    depts.remove(dept)
-                
-                if len(eval_batch) >= sample_size:
-                    break
-        
-        print(f"  - Validation set composition: {', '.join([p.department for p in eval_batch])}")
-        
-        print("  - Pre-calculating Step-2 results (Cache optimization)...")
-        for patient in eval_batch:
-            expert = self._get_matched_expert(patient)
-            cache_key = (patient.patient_id, expert['id'])
-            
-            if cache_key not in self.step2_cache:
-                try:
-                    step2_res = self.pipeline.step2_semantic_rewrite(patient, expert)
-                    self.step2_cache[cache_key] = step2_res['output']
-                except Exception as e:
-                    print(f"    Warning: Step-2 failed for {patient.patient_id}: {e}")
-                    self.step2_cache[cache_key] = f"Rewriting failed, original info: {patient.to_prompt_string()[:500]}"
-        
-        for idx, individual in enumerate(self.population):
-            if individual['fitness'] > 0:
-                continue
-                
-            print(f"  - Evaluating individual {idx+1}/{self.population_size} (ID: {individual['id']})...")
-            
-            total_score = 0
-            correct_count = 0
-            valid_evaluations = 0
-            
-            for patient in eval_batch:
-                try:
-                    expert = self._get_matched_expert(patient)
-                    cache_key = (patient.patient_id, expert['id'])
-                    step2_output = self.step2_cache.get(cache_key, "")
-                    
-                    step3_res = self.pipeline.step3_diagnosis(
-                        patient, expert, 
-                        step2_output, 
-                        custom_prompt_template=individual['prompt'],
-                        auto_retrieve=False
-                    )
-                    
-                    score, is_correct = self._judge_diagnosis(patient, step3_res['output'])
-                    total_score += score
-                    if is_correct:
-                        correct_count += 1
-                    valid_evaluations += 1
-                        
-                except Exception as e:
-                    print(f"    Warning: Evaluation failed for patient {patient.patient_id}: {e}")
-                    continue
-            
-            if valid_evaluations == 0:
-                individual['fitness'] = 0.0
-                individual['stats'] = {'accuracy': 0.0, 'avg_score': 0.0, 'valid_count': 0}
-                continue
-                
-            avg_score = total_score / valid_evaluations
-            accuracy = correct_count / valid_evaluations
-            fitness = accuracy * 0.7 + (avg_score / 100) * 0.3
-            if valid_evaluations < len(eval_batch) * 0.5:
-                fitness *= 0.8
-            
-            individual['fitness'] = fitness
-            individual['stats'] = {
-                'accuracy': accuracy, 
-                'avg_score': avg_score, 
-                'valid_count': valid_evaluations
-            }
-            print(f"    -> Fitness: {fitness:.4f} (Acc: {accuracy:.0%}, Valid: {valid_evaluations}/{len(eval_batch)})")
-            
-    def _judge_diagnosis(self, patient: PatientInfo, diagnosis_output: str, 
-                        max_retries: int = 2) -> Tuple[float, bool]:
-        """Uses LLM as a judge to evaluate diagnostic accuracy"""
-        judge_prompt = f"""
-You are a senior medical expert judge. Please evaluate the diagnostic accuracy of the AI doctor.
-
-[Golden Standard / True Diagnosis]
-{patient.main_diagnosis} (ICD: {patient.main_diagnosis_icd})
-
-[AI Doctor Diagnostic Output]
-{diagnosis_output}
-
-Please rate (0-100) and determine if it is correct (True/False).
-Criteria:
-- 100: Completely consistent, core diagnosis correct.
-- 80-99: Core diagnosis correct, minor details missing.
-- 60-79: Correct diagnostic direction, but specific disease is slightly off.
-- 0-59: Misdiagnosis or missed diagnosis.
-
-Output JSON: {{"score": 85, "is_correct": true, "reason": "..."}}
-Output JSON only."""
-        
-        for attempt in range(max_retries):
-            try:
-                res = self.pipeline._call_llm(judge_prompt)
-                if "```" in res:
-                    res = res.split("```json")[-1].split("```")[0] if "```json" in res else res.split("```")[-1].split("```")[0]
-                
-                data = json.loads(res.strip())
-                score = float(data.get('score', 0))
-                is_correct = bool(data.get('is_correct', False))
-                
-                if 0 <= score <= 100:
-                    return score, is_correct
-                else:
-                    continue
-            except Exception as e:
-                if attempt < max_retries - 1:
-                    continue
-        
-        return 30.0, False
-
-    def _mutate_prompt(self, prompt_text: str, intensity: str = "medium", 
-                      max_retries: int = 2) -> str:
-        """Mutation operator: Uses LLM to modify the prompt"""
-        mutation_prompt = f"""
-You are a prompt optimization expert. Please perform a [Mutation] on the following system prompt used for medical diagnosis.
-Mutation Intensity: {intensity}
-
-[Original Prompt]
-{prompt_text}
-
-[Requirements]
-1. Keep all formatting placeholders unchanged (e.g., {{resource}}, {{patient}}, {{expert}}).
-2. Randomly alter diagnostic strategy (e.g., more aggressive, more conservative, focus more on history, etc.).
-3. Adjust phrasing slightly to elicit different potentials of the LLM.
-4. Directly output the modified prompt content, without any explanation or Markdown tags.
-"""
-        
-        for attempt in range(max_retries):
-            try:
-                result = self.pipeline._call_llm(mutation_prompt).strip()
-                required_placeholders = ['{resource}', '{patient}', '{expert}']
-                if all(ph in result for ph in required_placeholders):
-                    return result
-                else:
-                    continue
-            except Exception as e:
-                if attempt < max_retries - 1:
-                    continue
-        
-        return prompt_text
-
-    def _crossover_prompts(self, prompt_a: str, prompt_b: str, 
-                          max_retries: int = 2) -> str:
-        """Crossover operator: Merges two prompts"""
-        crossover_prompt = f"""
-You are a prompt optimization expert. Please merge the following two medical diagnosis prompts into a new, superior prompt.
-
-[Parent Prompt A]
-{prompt_a}
-
-[Parent Prompt B]
-{prompt_b}
-
-[Requirements]
-1. Extract the best instructional parts from both for combination.
-2. Must keep all formatting placeholders ({{resource}}, {{patient}}, etc.).
-3. Generate a logically consistent and clear new prompt.
-4. Directly output the new prompt content, without any explanation.
-"""
-        
-        for attempt in range(max_retries):
-            try:
-                result = self.pipeline._call_llm(crossover_prompt).strip()
-                required_placeholders = ['{resource}', '{patient}', '{expert}']
-                if all(ph in result for ph in required_placeholders):
-                    return result
-                else:
-                    continue
-            except Exception as e:
-                if attempt < max_retries - 1:
-                    continue
-        
-        import random
-        return random.choice([prompt_a, prompt_b])
-
-    def selection(self):
-        """Selection operator: Elitism + Roulette Wheel"""
-        sorted_pop = sorted(self.population, key=lambda x: x['fitness'], reverse=True)
-        current_best = sorted_pop[0]['fitness']
-        
-        if len(self.fitness_history) > 0:
-            if current_best <= max(self.fitness_history):
-                self.stagnation_count += 1
-                print(f"  - No improvement ({self.stagnation_count}/{self.max_stagnation})")
-            else:
-                self.stagnation_count = 0
-        
-        self.fitness_history.append(current_best)
-        self.best_individual = sorted_pop[0]
-        print(f"  - Current best individual: {self.best_individual['id']}, Fitness: {current_best:.4f}")
-        
-        new_pop = []
-        for i in range(min(self.elitism_count, len(sorted_pop))):
-            new_pop.append(sorted_pop[i])
-            print(f"    Keeping elite: {sorted_pop[i]['id']} (Fitness: {sorted_pop[i]['fitness']:.4f})")
-        
-        parents_pool = sorted_pop[:max(len(sorted_pop)//2, 2)]
-        while len(new_pop) < self.population_size:
-            import random
-            if random.random() < 0.8 and len(parents_pool) >= 2:
-                parent_a = random.choice(parents_pool)
-                parent_b = random.choice(parents_pool)
-                if parent_a == parent_b and len(parents_pool) > 1:
-                    continue
-                
-                child_prompt = self._crossover_prompts(parent_a['prompt'], parent_b['prompt'])
-                if random.random() < 0.1:
-                    child_prompt = self._mutate_prompt(child_prompt, intensity="low")
-                
-                new_pop.append({
-                    'id': f'gen{self.generation+1}_child_{len(new_pop)}',
-                    'prompt': child_prompt,
-                    'fitness': 0.0,
-                    'stats': {}
-                })
-            else:
-                parent = random.choice(parents_pool)
-                child_prompt = self._mutate_prompt(parent['prompt'], intensity="medium")
-                new_pop.append({
-                    'id': f'gen{self.generation+1}_mutant_{len(new_pop)}',
-                    'prompt': child_prompt,
-                    'fitness': 0.0,
-                    'stats': {}
-                })
-        
-        self.population = new_pop
-
-    def should_early_stop(self) -> bool:
-        """Checks if early stopping should be triggered"""
-        return self.stagnation_count >= self.max_stagnation
-
-    def run_evolution(self, validation_patients: List[PatientInfo], generations: int = 10, top_k_return: int = 32):
-        """Runs the main evolution loop"""
-        self.initialize_population()
-        
-        for g in range(generations):
-            self.generation = g
-            print(f"\n" + "="*60)
-            print(f"[Evolution Generation: {g+1}/{generations}]")
-            print(f"="*60)
-            
-            self.evaluate_fitness(validation_patients)
-            
-            for ind in self.population:
-                if ind.get('fitness', 0) > 0:
-                    exists = False
-                    for existing in self.hall_of_fame:
-                        if existing['prompt'] == ind['prompt']:
-                            exists = True
-                            if ind['fitness'] > existing['fitness']:
-                                existing['fitness'] = ind['fitness']
-                                existing['stats'] = ind['stats']
-                                existing['id'] = ind['id']
-                            break
-                    if not exists:
-                        self.hall_of_fame.append(ind.copy())
-            
-            self.hall_of_fame.sort(key=lambda x: x['fitness'], reverse=True)
-            print(f"  📊 Hall of Fame currently has: {len(self.hall_of_fame)} valid experts")
-            
-            best = max(self.population, key=lambda x: x['fitness'])
-            print(f"\n>>> Best Prompt of Gen {g+1} (Fitness: {best['fitness']:.4f}):")
-            print(best['prompt'][:200] + "...")
-            
-            checkpoint = {
-                'generation': g,
-                'best_individual': best,
-                'fitness_history': self.fitness_history,
-                'population_stats': {
-                    'avg_fitness': sum(ind['fitness'] for ind in self.population) / len(self.population),
-                    'max_fitness': max(ind['fitness'] for ind in self.population),
-                    'min_fitness': min(ind['fitness'] for ind in self.population)
-                }
-            }
-            
-            with open(f"ga_gen_{g}_checkpoint.json", "w", encoding='utf-8') as f:
-                json.dump(checkpoint, f, ensure_ascii=False, indent=2)
-            
-            if g < generations - 1:
-                self.selection()
-                if self.should_early_stop():
-                    print(f"\n🔄 Early stop triggered: {self.stagnation_count} generations without improvement")
-                    break
-                
-        print("\n🏆 Evolution complete! Exporting optimal expert pool...")
-        final_pool = self.hall_of_fame[:top_k_return]
-        
-        if len(final_pool) < top_k_return:
-            seen_prompts = {p['prompt'] for p in final_pool}
-            for ind in self.population:
-                if len(final_pool) >= top_k_return:
-                    break
-                if ind['prompt'] not in seen_prompts:
-                    final_pool.append(ind)
-                    seen_prompts.add(ind['prompt'])
-        
-        return final_pool
-
-
 def main(
     activation_mode: str = "eep_semantic", 
     top_k: int = 8, 
@@ -1442,7 +1043,7 @@ def main(
     evolved_pool_path: str = "outputs/moa_optimized_expert_pool_64.json",
     evolved_selection_strategy: str = "hybrid"
 ):
-    """Main Function"""
+    \"\"\"Main Function\"\"\"
     print("="*70)
     print("Hybrid Multi-Specialty Expert Agent Diagnosis System")
     print(f"Mode: {activation_mode}")
@@ -1473,6 +1074,8 @@ def main(
             print("Cannot run GA training without data file.")
             return
         
+        from evomed.evoexperts.optimizer import GeneticPromptOptimizer
+        
         valid_mask = df['is_history_cleaned'] == True
         valid_df = df[valid_mask]
         if len(valid_df) == 0:
@@ -1499,7 +1102,7 @@ def main(
         with open(pool_file, 'w', encoding='utf-8') as f:
             json.dump(best_expert_pool, f, ensure_ascii=False, indent=2)
             
-        print(f"\n🏆 Evolution complete! Optimal expert pool saved to {pool_file}")
+        print(f"\\n🏆 Evolution complete! Optimal expert pool saved to {pool_file}")
         return best_expert_pool
 
     # Inference mode requires patient data. If df is empty, this part will fail or needs manual patient input.
@@ -1521,7 +1124,7 @@ def main(
     with open(output_file, 'w', encoding='utf-8') as f:
         json.dump(results, f, ensure_ascii=False, indent=2)
     
-    print(f"\nDiagnosis complete! Result saved to: {output_file}")
+    print(f"\\nDiagnosis complete! Result saved to: {output_file}")
     return results
 
 

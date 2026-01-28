@@ -26,10 +26,10 @@ from typing import Dict, List, Optional, Any, Tuple
 from dataclasses import dataclass, field
 from openai import OpenAI
 
-from ace.prompt.step1_route import system_step1_prompt
-from ace.prompt.step2_ir import system_step2_prompt
-from ace.prompt.step3_diag import system_step3_prompt
-from ace.prompt.step4_agg import system_step4_prompt as system_step4_prompt_v2
+from evomed.prompt.step1_route import system_step1_prompt
+from evomed.prompt.step2_ir import system_step2_prompt
+from evomed.prompt.step3_diag import system_step3_prompt
+from evomed.prompt.step4_agg import system_step4_prompt as system_step4_prompt_v2
 
 # =============================================================================
 # API configuration

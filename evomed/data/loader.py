@@ -14,7 +14,7 @@ from datetime import datetime
 from typing import Dict, Any, Optional
 from dataclasses import dataclass
 
-from ace.diagnosis import (
+from evomed.diagnosis import (
     DiagnosticPipeline, 
     PatientInfo,
     API_KEY, 

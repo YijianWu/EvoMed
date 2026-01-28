@@ -22,7 +22,7 @@ import os
 # Add project path
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 
-from ace.pipeline import DiagnosisAPI, diagnose_patient
+from evomed.pipeline import DiagnosisAPI, diagnose_patient
 
 
 # ============================================================
