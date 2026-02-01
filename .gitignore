@@ -1,0 +1,62 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# Virtual Env
+venv/
+.venv/
+env/
+ENV/
+
+# IDE
+.idea/
+.vscode/
+*.swp
+.DS_Store
+
+# Logs
+*.log
+webui.log
+
+# Large Data & Files (See data/LARGE_FILES_LIST.md)
+*.xlsx
+*.bin
+*.sqlite3
+*.faiss
+*.pkl
+diagnosis_result_*.json
+ga_gen_*_checkpoint.json
+
+# Project Specific Large Folders
+# Exclude the entire rag folder as requested
+rag/
+memory_db/
+outputs/reports/
+# Exclude large reports in sub-directories if they are generated artifacts
+reports/questions_report_snapshot_*.md
+case_library/cases_initial.jsonl
+storage/ace_case_library.jsonl
+storage/ace_experiences.jsonl
+
+# Exclude large test file if it appears
+test.xlsx
+guilin_100K_20K_diagnosis_20260102_161948.xlsx
